@@ -133,45 +133,57 @@ def transformer_classification(portion=1.):
     return accuracy
 
 
-# # Q3
-# def zeroshot_classification(portion=1.):
-#     """
-#     Perform zero-shot classification
-#     :param portion: portion of the data to use
-#     :return: classification accuracy
-#     """
-#     from transformers import pipeline
-#     from sklearn.metrics import accuracy_score
-#     import torch
-#     x_train, y_train, x_test, y_test = get_data(categories=category_dict.keys(), portion=portion)
-#     clf = pipeline("zero-shot-classification", model='cross-encoder/nli-MiniLM2-L6-H768')
-#     candidate_labels = list(category_dict.values())
-#
-#     # Add your code here
-#     # see https://huggingface.co/docs/transformers/v4.25.1/en/main_classes/pipelines#transformers.ZeroShotClassificationPipeline
-#     return
+# Q3
+def zeroshot_classification(portion=1.):
+    """
+    Perform zero-shot classification
+    :param portion: portion of the data to use
+    :return: classification accuracy
+    """
+    from transformers import pipeline
+    from sklearn.metrics import accuracy_score
+    import torch
+    x_train, y_train, x_test, y_test = get_data(categories=category_dict.keys(), portion=portion)
+    clf = pipeline("zero-shot-classification", model='cross-encoder/nli-MiniLM2-L6-H768')
+    candidate_labels = list(category_dict.values())
+
+
+    # Add your code here
+    # see https://huggingface.co/docs/transformers/v4.25.1/en/main_classes/pipelines#transformers.ZeroShotClassificationPipeline
+    y_labels = np.array(candidate_labels)[y_test]
+    clf_output = clf(x_test, candidate_labels)
+    predicted_labels = [c['labels'][0] for c in clf_output]
+    acc = accuracy_score(y_labels, predicted_labels)
+    return acc
 
 
 def main():
     portions = [0.1, 0.5, 1.]
-    # # Q1
-    # print("Logistic regression results:")
-    # acc_p_1 = []
-    # plt.figure()
-    # for p in portions:
-    #     print(f"Portion: {p}")
-    #     acc_p = linear_classification(p)
-    #     acc_p_1.append(acc_p)
-    #     plt.scatter(p, acc_p, color='teal')
-    #     print(acc_p)
-    # plt.title('Model #1: accuracy as a function of portions')
-    # plt.plot(portions, acc_p_1, color='lightseagreen', label='accuracy')
-    # plt.xlabel('portion')
-    # plt.ylabel('accuracy')
-    # plt.legend()
-    # plt.show()
+    # Q1
+    # p 0.1: 0.7208222811671088
+    # p 0.5: 0.8103448275862069
+    # p 1: 0.8275862068965517
+    print("Logistic regression results:")
+    acc_p_1 = []
+    plt.figure()
+    for p in portions:
+        print(f"Portion: {p}")
+        acc_p = linear_classification(p)
+        acc_p_1.append(acc_p)
+        plt.scatter(p, acc_p, color='teal')
+        print(acc_p)
+    plt.title('Model #1: accuracy as a function of portions')
+    plt.plot(portions, acc_p_1, color='lightseagreen', label='accuracy')
+    plt.xlabel('portion')
+    plt.ylabel('accuracy')
+    plt.legend()
+    plt.show()
 
     # Q2
+    # Finetuning:
+    # p 0.1: 0.8587533156498673
+    # p 0.5: 0.8978779840848806
+    # p 1: 0.9091511936339522
     acc_p_2 = []
     print("\nFinetuning results:")
     for p in portions:
@@ -187,9 +199,23 @@ def main():
     plt.legend()
     plt.show()
 
-    # # Q3
-    # print("\nZero-shot result:")
-    # print(zeroshot_classification())
-
+    # Q3
+    # Zero Shot Classification:
+    # 0.7712201591511937
+    print("Zero Shot classification:")
+    acc_p_3 = []
+    plt.figure()
+    for p in portions:
+        print(f"Portion: {p}")
+        acc_p = zeroshot_classification(p)
+        acc_p_3.append(acc_p)
+        plt.scatter(p, acc_p, color='tomato')
+        print(acc_p)
+    plt.title('Model #3: accuracy as a function of portions')
+    plt.plot(portions, acc_p_3, color='lightsalmon', label='accuracy')
+    plt.xlabel('portion')
+    plt.ylabel('accuracy')
+    plt.legend()
+    plt.show()
 
 main()
