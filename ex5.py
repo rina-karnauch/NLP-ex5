@@ -144,7 +144,9 @@ def zeroshot_classification(portion=1.):
     from sklearn.metrics import accuracy_score
     import torch
     x_train, y_train, x_test, y_test = get_data(categories=category_dict.keys(), portion=portion)
-    clf = pipeline("zero-shot-classification", model='cross-encoder/nli-MiniLM2-L6-H768')
+    clf = pipeline("zero-shot-classification",
+                   model='cross-encoder/nli-MiniLM2-L6-H768',
+                   device=torch.device('cuda:0' if torch.cuda.is_available() else 'cpu'))
     candidate_labels = list(category_dict.values())
 
 
